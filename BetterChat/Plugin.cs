@@ -6,10 +6,10 @@ using System.Globalization;
 
 namespace BetterChat
 {
-    [BepInPlugin($"lammas123.{MyPluginInfo.PLUGIN_NAME}", MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-    public class BetterChat : BasePlugin
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    public sealed class BetterChat : BasePlugin
     {
-        internal static BetterChat Instance;
+        internal static BetterChat Instance { get; private set; }
 
         internal bool formatReturnedUsername = false;
         internal string usernameFormatting;
@@ -38,8 +38,10 @@ namespace BetterChat
             Api.RegisterFormatting("CLIENT_ID", FormatClientId);
             Api.RegisterFormatting("LIVING", FormatLiving);
 
-            Harmony.CreateAndPatchAll(typeof(Patches));
-            Log.LogInfo($"Loaded [{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}]");
+            Harmony harmony = new(MyPluginInfo.PLUGIN_NAME);
+            harmony.PatchAll(typeof(Patches));
+
+            Log.LogInfo($"Initialized [{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}]");
         }
 
         internal static string FormatUsername(ulong clientId)
